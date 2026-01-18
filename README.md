@@ -25,6 +25,14 @@
 4. **提示词预算拼接**：把系统提示/记忆/历史/当前输入按预算拼成最终输入（`--pack_mode slot` 会做槽位预算；或使用模型自带 chat template）。
 5. **超预算自动压缩**：如果仍超过 `prompt_budget`，就把最老的一批兄弟节点合并成 `summary` 节点（`--summary_mode truncate|llm|state`），在保留细节（叶子）同时保留高层信息（摘要）。
 
+## 实现概览
+简而言之，所有的叶子节点是具体的记忆，父节点是所有子节点的摘要压缩。
+- **记忆树结构**：`memory_tree.json` 记录 root/leaf/summary 三类节点；leaf 保存原样对话，summary 聚合早期节点，并通过 `children/parent_id` 保留可回溯关系。
+- **向量缓存与索引**：`memory_vectors.json` 缓存记忆向量；索引优先用 HNSW（持久化到 `memory_hnsw.bin`），维度或模型指纹不一致时自动重建。
+- **检索与补细节**：用当前输入 + 最近历史构造 query，Top-K 检索后可选轻量重排；命中 summary 节点时可 `--expand_children` 展开部分子节点。
+- **提示词拼接**：按槽位预算拼 `[SYS]/[MEM]/[HIST]/[USER]`，或直接走模型的 chat template。
+- **超预算压缩**：当提示词超过预算，按 `summary_mode` 合并最老节点并生成摘要节点，兼顾可追溯与上下文压缩。
+
 ## 依赖
 
 - Python 3.10+
