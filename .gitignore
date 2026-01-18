@@ -1,0 +1,40 @@
+# Local persistent memory / vector index artifacts
+local_memory/
+memory_tree.json
+memory_vectors.json
+memory_hnsw.bin
+*.meta.json
+
+# Local model weights (HF save_pretrained dirs)
+model/**
+!model/README.md
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyd
+*.so
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Virtualenv / env files
+.venv/
+venv/
+.env
+.env.*
+
+# Build / packaging
+build/
+dist/
+*.egg-info/
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Logs / temp
+*.log
+*.tmp
